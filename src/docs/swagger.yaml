@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: FoodieRank API
+  version: 1.0.0
+  description: API para sistema de ranking de restaurantes y platos
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Servidor de desarrollo
+paths:
+  /usuarios/registro:
+    post:
+      tags: [Usuarios]
+      summary: Registrar nuevo usuario
+      description: Crea una nueva cuenta de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, email, password]
+              properties:
+                nombre:
+                  type: string
+                  maxLength: 100
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 6
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+        '400':
+          description: Error de validación
+        '409':
+          description: Email ya registrado
+  /usuarios/login:
+    post:
+      tags: [Usuarios]
+      summary: Iniciar sesión
+      description: Autentica un usuario y retorna un token JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login exitoso
+        '401':
+          description: Credenciales inválidas
+  /usuarios/perfil:
+    get:
+      tags: [Usuarios]
+      summary: Obtener perfil del usuario autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Perfil del usuario
+        '401':
+          description: No autorizado
+  /categorias:
+    get:
+      tags: [Categorías]
+      summary: Obtener todas las categorías
+      responses:
+        '200':
+          description: Lista de categorías
+    post:
+      tags: [Categorías]
+      summary: Crear nueva categoría
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre]
+              properties:
+                nombre:
+                  type: string
+                descripcion:
+                  type: string
+      responses:
+        '201':
+          description: Categoría creada
+        '403':
+          description: Solo administradores
+  /restaurantes:
+    get:
+      tags: [Restaurantes]
+      summary: Obtener restaurantes
+      parameters:
+        - name: categoriaId
+          in: query
+          schema:
+            type: string
+        - name: ordenarPor
+          in: query
+          schema:
+            type: string
+            enum: [ranking, calificacionPromedio, nombre, fechaCreacion]
+        - name: orden
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Lista de restaurantes
+    post:
+      tags: [Restaurantes]
+      summary: Crear nuevo restaurante
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre]
+              properties:
+                nombre:
+                  type: string
+                descripcion:
+                  type: string
+                categoriaId:
+                  type: string
+                ubicacion:
+                  type: string
+                imagen:
+                  type: string
+                  format: uri
+      responses:
+        '201':
+          description: Restaurante creado (pendiente de aprobación)
+  /restaurantes/{id}/aprobar:
+    patch:
+      tags: [Restaurantes]
+      summary: Aprobar restaurante
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Restaurante aprobado
+        '403':
+          description: Solo administradores
+  /platos:
+    post:
+      tags: [Platos]
+      summary: Crear nuevo plato
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, restauranteId]
+              properties:
+                nombre:
+                  type: string
+                descripcion:
+                  type: string
+                restauranteId:
+                  type: string
+                imagen:
+                  type: string
+                  format: uri
+                precio:
+                  type: number
+      responses:
+        '201':
+          description: Plato creado
+  /platos/restaurante/{restauranteId}:
+    get:
+      tags: [Platos]
+      summary: Obtener platos de un restaurante
+      parameters:
+        - name: restauranteId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de platos
+  /reseñas:
+    post:
+      tags: [Reseñas]
+      summary: Crear nueva reseña
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [restauranteId, calificacion]
+              properties:
+                restauranteId:
+                  type: string
+                comentario:
+                  type: string
+                calificacion:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+      responses:
+        '201':
+          description: Reseña creada
+  /reseñas/{id}/like:
+    post:
+      tags: [Reseñas]
+      summary: Dar like a una reseña
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Like registrado
+  /reseñas/{id}/dislike:
+    post:
+      tags: [Reseñas]
+      summary: Dar dislike a una reseña
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dislike registrado
+  /ranking/restaurantes:
+    get:
+      tags: [Ranking]
+      summary: Obtener ranking de restaurantes
+      parameters:
+        - name: categoriaId
+          in: query
+          schema:
+            type: string
+        - name: ordenarPor
+          in: query
+          schema:
+            type: string
+            enum: [ranking, calificacionPromedio, nombre]
+        - name: orden
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Ranking de restaurantes
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
