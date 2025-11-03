@@ -9,13 +9,12 @@
 
 ## 🔗 Frontend Repository
 
-**Repositorio del Frontend:** [Frontend FoodStars](https://github.com/DanielSantiagoV/Frontend_FoodStars.git)
+**Repositorio del Frontend:** [Frontend FoodStars](https://github.com/DanielSantiagoV/Fronted_FoodStars.git)
 
 El frontend está desarrollado con tecnologías modernas, conectándose a este backend a través de las APIs documentadas.
 
 ## 🔗 Videos sustentación
-**Parte1:** [Backend](https://youtu.be/TTiMNBuULb8)
-**Parte2:**  [Frontend](https://youtu.be/mhJwC_7tgP8)
+**Parte1:** [full-stack](https://youtu.be/qPP1JMyk5Jk)
 
 ## 📋 Descripción del Proyecto
 
@@ -1377,11 +1376,8 @@ export async function ejecutarTransaccion(operacion) {
 Este proyecto fue desarrollado siguiendo la metodología Scrum, una framework ágil que promueve la colaboración, la adaptabilidad y la entrega iterativa de valor. El equipo trabajó en sprints cortos con reuniones diarias, planificación de sprints y retrospectivas para garantizar la calidad y eficiencia del desarrollo.
 
 #### 📄 **Documentación Scrum Completa**
-- **[📋 Documentación Scrum Detallada](docs/DocumentacionScrum_FoodStars.pdf)** - Documento completo con toda la metodología Scrum aplicada al proyecto
+- **[📋 Documentación Scrum Detallada](https://drive.google.com/file/d/10r4AtOB2vJ3toecJpNwhBEQUvpJtTu4w/view?usp=drive_link)** - Documento completo con toda la metodología Scrum aplicada al proyecto
 
-#### 🎥 **Explicación Técnica del Proyecto**
-- **[🎥 Video Explicación Técnica Backend](https://youtu.be/TTiMNBuULb8)** - Video detallado con la explicación técnica completa del backend
-- **[🎥 Video Explicación Frontend](https://youtu.be/mhJwC_7tgP8)** - Video detallado del frontend
 
 ### 👥 Roles del Equipo Scrum
 
