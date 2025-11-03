@@ -1,7 +1,7 @@
 # 🍽️ Backend FoodStars - Sistema de Ranking de Restaurantes
 
 <div align="center">
-  <img src="https://media.tenor.com/_mOMxTWntRcAAAAi/pepe-gaming.gif" alt="FoodStars" width="300" height="200">
+  <img src="https://media.tenor.com/fWD5SZjcqHwAAAAi/cooking-nasogg.gif" alt="FoodStars" width="300" height="200">
 </div>
 
 > **Sistema de Gestión y Ranking de Restaurantes y Platos**  
