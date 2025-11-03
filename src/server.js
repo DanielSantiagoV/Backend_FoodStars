@@ -39,6 +39,8 @@ app.get("/health", (req, res) => {
 });
 
 // API Routes (versioned)
+// Ruta de admin debe ir antes para evitar conflictos
+app.use(`/api/v1/admin/usuarios`, usuarioRouter); // Alias para compatibilidad con frontend
 app.use(`/api/v1/usuarios`, usuarioRouter);
 app.use(`/api/v1/categorias`, categoriaRouter);
 app.use(`/api/v1/restaurantes`, restauranteRouter);

@@ -125,34 +125,28 @@ export async function obtenerTodosLosUsuarios(opciones = {}) {
     const db = obtenerBD();
     const { limite = 100, saltar = 0 } = opciones;
     
-    // Obtener usuarios con agregación para contar reseñas
+    // Obtener usuarios básicos primero
     const usuarios = await db.collection(COLLECTION)
-        .aggregate([
-            {
-                $lookup: {
-                    from: 'reseñas',
-                    localField: '_id',
-                    foreignField: 'usuarioId',
-                    as: 'reseñas'
-                }
-            },
-            {
-                $project: {
-                    password: 0,
-                    totalReseñas: { $size: '$reseñas' },
-                    nombre: 1,
-                    email: 1,
-                    rol: 1,
-                    fechaCreacion: 1,
-                    fechaRegistro: '$fechaCreacion'
-                }
-            },
-            { $skip: saltar },
-            { $limit: limite },
-            { $sort: { fechaCreacion: -1 } }
-        ])
+        .find({}, { projection: { password: 0 } })
+        .sort({ fechaCreacion: -1 })
+        .skip(saltar)
+        .limit(limite)
         .toArray();
     
-    return usuarios;
+    // Contar reseñas para cada usuario
+    const usuariosConReseñas = await Promise.all(
+        usuarios.map(async (usuario) => {
+            const totalReseñas = await db.collection('reseñas')
+                .countDocuments({ usuarioId: usuario._id });
+            
+            return {
+                ...usuario,
+                totalReseñas
+            };
+        })
+    );
+    
+    return usuariosConReseñas;
 }
+
 
