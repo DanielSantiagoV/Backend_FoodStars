@@ -29,6 +29,7 @@ import platoRouter from "./routes/plato.routes.js";
 import reseñaRouter from "./routes/reseña.routes.js";
 // Importa el router que contiene todas las rutas relacionadas con rankings
 import rankingRouter from "./routes/ranking.routes.js";
+import notificacionRouter from "./routes/notificacion.routes.js";
 
 // Config
 // Crea una instancia de la aplicación Express
@@ -77,6 +78,7 @@ app.use(`/api/v1/platos`, platoRouter);
 app.use(`/api/v1/resenas`, reseñaRouter);
 // Registra el router de rankings en la ruta /api/v1/ranking
 app.use(`/api/v1/ranking`, rankingRouter);
+app.use(`/api/v1/notificaciones`, notificacionRouter);
 
 // Manejo de errores (debe ir al final)
 // Middleware que maneja las rutas que no fueron encontradas (404)

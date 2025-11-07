@@ -11,6 +11,8 @@ import {
     eliminarReseña,  // Función para eliminar una reseña
     obtenerEstadisticasReseñas  // Función para obtener estadísticas de reseñas
 } from '../models/reseña.model.js';
+// Importa la función del modelo de notificaciones para crear notificaciones automáticamente
+import { crearNotificacionesNuevaReseña } from '../models/notificacion.model.js';
 // Importa la función del modelo de restaurantes para actualizar el promedio de calificaciones
 import { actualizarCalificacionPromedio } from '../models/restaurante.model.js';
 // Importa el servicio de transacciones para ejecutar operaciones atómicas
@@ -88,6 +90,16 @@ export const crear = async (req, res) => {
         // Esta operación se hace fuera de la transacción porque puede ser más lenta
         // y no necesita ser atómica con la creación de la reseña
         await actualizarRankingRestaurante(restauranteId);
+        
+     
+        crearNotificacionesNuevaReseña(
+            restauranteId,
+            nuevaReseña._id.toString(),
+            usuarioId
+        ).catch(error => {
+            
+            console.error('Error al crear notificaciones:', error.message);
+        });
         
         // Retorna una respuesta exitosa con código 201 (CREATED)
         return responderExito(

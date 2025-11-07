@@ -147,6 +147,11 @@ async function crearIndices() {
         // Índice en usuarioId para obtener todas las reseñas de un usuario
         await db.collection("reseñas").createIndex({ usuarioId: 1 });
         
+        
+        await db.collection("notificaciones").createIndex({ usuarioId: 1 });
+        await db.collection("notificaciones").createIndex({ usuarioId: 1, vista: 1 });
+        await db.collection("notificaciones").createIndex({ fechaCreacion: -1 });
+        
         // Mensaje de confirmación cuando todos los índices se crean exitosamente
         console.log("Índices creados correctamente");
     } catch (error) {
