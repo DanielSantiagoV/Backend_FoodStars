@@ -44,7 +44,7 @@ export const crear = async (req, res) => {
         const { restauranteId, comentario, calificacion } = req.body;
         
         // Variable para almacenar la reseña creada
-        let nuevaReseña;
+        let nuevaReseña; 
         
         // Crear reseña y actualizar promedio del restaurante en una transacción
         // ejecutarTransaccion ejecuta todas las operaciones en una transacción atómica
@@ -585,4 +585,3 @@ export const eliminar = async (req, res) => {
         return responderError(res, HTTP_STATUS.INTERNAL_SERVER_ERROR, error.message);
     }
 };
-
