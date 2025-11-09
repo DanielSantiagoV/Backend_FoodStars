@@ -28,6 +28,9 @@ import { obtenerBD } from '../config/db.js';
 // Importa constantes desde el módulo de constants
 // HTTP_STATUS: códigos de estado HTTP (200, 201, 404, etc.)
 import { HTTP_STATUS } from '../utils/constants.js';
+// Importa las funciones del modelo de notificaciones
+// crearNotificacionesMasivas: crea notificaciones para múltiples usuarios
+import { crearNotificacionesMasivas } from '../models/notificacion.model.js';
 
 /**
  * Crear nueva reseña (con transacción)
@@ -58,8 +61,7 @@ export const crear = async (req, res) => {
             );
             
             // Obtener todas las calificaciones del restaurante para calcular promedio
-            // Importa dinámicamente obtenerBD (aunque ya está importado arriba, esto asegura que funcione)
-            const { obtenerBD } = await import('../config/db.js');
+            // obtenerBD ya está importado al inicio del archivo
             const db = obtenerBD();
             // Busca todas las reseñas del restaurante (incluyendo la nueva)
             // projection: { calificacion: 1 } solo trae el campo calificacion para eficiencia
@@ -88,6 +90,59 @@ export const crear = async (req, res) => {
         // Esta operación se hace fuera de la transacción porque puede ser más lenta
         // y no necesita ser atómica con la creación de la reseña
         await actualizarRankingRestaurante(restauranteId);
+        
+        // Crear notificaciones para usuarios que tienen reseñas de este restaurante
+        // Esta operación se hace fuera de la transacción para no bloquear
+        // y no necesita ser atómica con la creación de la reseña
+        try {
+            // Obtiene la referencia a la base de datos
+            const db = obtenerBD();
+            
+            // Buscar todos los usuarios que tienen reseñas de este restaurante
+            // Usa agregación para obtener los IDs únicos de usuarios que han reseñado este restaurante
+            const usuariosConReseñas = await db.collection('reseñas')
+                .aggregate([
+                    // $match: Filtra las reseñas del restaurante especificado
+                    { $match: { restauranteId: nuevaReseña.restauranteId } },
+                    // $group: Agrupa por usuarioId para obtener IDs únicos
+                    { $group: { _id: '$usuarioId' } },
+                    // $project: Renombra _id a usuarioId para facilitar el acceso
+                    { $project: { usuarioId: '$_id', _id: 0 } }
+                ])
+                .toArray();
+            
+            // Extrae solo los IDs de usuarios como strings
+            const usuarioIds = usuariosConReseñas
+                .map(u => u.usuarioId.toString())
+                // Excluye al autor de la nueva reseña (no se notifica a sí mismo)
+                .filter(id => id !== usuarioId);
+            
+            // Si hay usuarios a notificar, crear las notificaciones
+            if (usuarioIds.length > 0) {
+                // Obtener información del restaurante para el mensaje de la notificación
+                const restaurante = await db.collection('restaurantes').findOne(
+                    { _id: nuevaReseña.restauranteId },
+                    { projection: { nombre: 1 } }
+                );
+                
+                // Crear notificaciones masivas para todos los usuarios
+                // No se usa transacción aquí porque no es crítico si falla
+                await crearNotificacionesMasivas(
+                    usuarioIds,
+                    {
+                        tipo: 'nueva_reseña',
+                        mensaje: `Se ha publicado una nueva reseña en ${restaurante?.nombre || 'un restaurante'}`,
+                        restauranteId: nuevaReseña.restauranteId.toString(),  // Usa el ObjectId de la reseña creada
+                        reseñaId: nuevaReseña._id.toString()
+                    }
+                );
+            }
+        } catch (error) {
+            // Si falla la creación de notificaciones, no afecta la respuesta
+            // Solo se registra el error en consola para debugging
+            console.error('Error al crear notificaciones:', error);
+            // No se lanza el error para no afectar la creación de la reseña
+        }
         
         // Retorna una respuesta exitosa con código 201 (CREATED)
         return responderExito(

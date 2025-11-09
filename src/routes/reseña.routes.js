@@ -352,28 +352,3 @@ router.delete(
 // Exporta el router para que pueda ser montado en la aplicación principal
 // Se importará en el archivo principal de rutas (app.js o server.js)
 export default router;
-
-
-
-/**
- * @route (GET /notificaciones/:usuarioId)
- * @desc Obtener reseñas de un restaurante
- * @access Public
- */
-// Define la ruta GET para obtener notificaciones de reseñas 
-// Esta ruta es pública, no requiere autenticación
-router.get(
-    '/restaurante/:restauranteId',  // Ruta relativa con parámetro dinámico: /api/v1/reseñas/restaurante/:restauranteId
-)
-
-
-/**
- * @route (PUT /notificaciones/:id/vista)
- * @desc Obtener notificaciones
- * @access Public
- */
-// Define la ruta GET para obtener todas las reseñas de un restaurante específico
-// Esta ruta es pública, no requiere autenticación
-router.get(
-    '/restaurante/:restauranteId',  // Ruta relativa con parámetro dinámico: /api/v1/reseñas/restaurante/:restauranteId
-)
